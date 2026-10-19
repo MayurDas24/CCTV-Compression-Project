@@ -1,0 +1,3 @@
+method,original_size_mb,compressed_size_mb,storage_reduction_percent,mean_psnr,mean_ssim,frames_evaluated
+H265_Baseline,60.53,11.166,81.55,39.55,0.9774,106
+H265_Adaptive,60.53,2.025,96.66,31.16,0.8569,106

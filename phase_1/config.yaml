@@ -1,0 +1,15 @@
+stream:
+  rtsp_url: "rtsp://127.0.0.1:8554/live/cctv0"
+  reconnect_attempts: 10
+  reconnect_delay_seconds: 3
+  frame_buffer_size: 60
+
+encoding:
+  codec: "libx265"
+  preset: "ultrafast"
+  crf: 28
+  fps: null
+  output_directory: "./logs/streams"
+
+monitoring:
+  metrics_interval_seconds: 5

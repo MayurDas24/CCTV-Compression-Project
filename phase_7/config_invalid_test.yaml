@@ -1,0 +1,197 @@
+﻿schema_version: "1.0"
+phase: "phase_7"
+
+paths:
+  # Relative paths are resolved from the phase_7 directory.
+  output_root: "outputs"
+
+runtime:
+  ffprobe_path: "ffprobe"
+  ffprobe_timeout_seconds: 120
+
+  # Total timeout for one camera's adapter process, including
+  # Phases 2, 3, 4, 5, and 6.
+  processing_timeout_seconds: 7200
+
+  shutdown_grace_seconds: 15
+  log_level: "INFO"
+
+processing:
+  # Safe default:
+  #
+  # probe_only:
+  #   Validates and probes sources. It never runs compression or claims
+  #   compression success.
+  #
+  # external_pipeline:
+  #   Invokes the configured command adapter. The normal config remains
+  #   probe_only; use --run-pipeline for explicit real processing.
+  mode: "probe_only"
+
+  command_adapter:
+    # Relative to this config file. ".." is the project root.
+    working_directory: ".."
+
+    # Every item is passed directly to subprocess.Popen with shell=False.
+    #
+    # Supported placeholders:
+    #   {python_executable}
+    #   {camera_id}
+    #   {source}
+    #   {camera_output_dir}
+    #   {run_output_dir}
+    #   {project_root}
+    #   {processing_timeout_seconds}
+    #   {shutdown_grace_seconds}
+    #
+    # Using {python_executable} ensures the adapter uses the currently
+    # active virtual environment.
+    command:
+      - "{python_executable}"
+      - "-u"
+      - "{project_root}/phase_7/pipeline_adapter.py"
+      - "--project-root"
+      - "{project_root}"
+      - "--source"
+      - "{source}"
+      - "--camera-id"
+      - "{camera_id}"
+      - "--camera-output-dir"
+      - "{camera_output_dir}"
+      - "--shutdown-grace-seconds"
+      - "{shutdown_grace_seconds}"
+
+    environment: {}
+
+    # A zero exit code alone is insufficient. The adapter must also write
+    # every required non-empty artifact and its JSON report must contain
+    # accepted success values.
+    success_validation:
+      require_zero_exit_code: true
+
+      # Paths are relative to the camera's unique output directory:
+      #
+      #   phase_7/outputs/<run-id>/cameras/<camera-id>/
+      required_artifacts:
+        - "final/compressed_video.mp4"
+        - "final/phase_6_final_report.json"
+        - "final/phase_6_final_report.txt"
+        - "final/phase_6_artifact_manifest.json"
+        - "pipeline_adapter_result.json"
+
+      report_json: "pipeline_adapter_result.json"
+
+      status_fields:
+        - "status"
+
+      accepted_status_values:
+        - "completed"
+
+      compression_status_field: "compression_success_verified"
+
+      accepted_compression_values:
+        - "true"
+
+    capture:
+      save_stdout: true
+      save_stderr: true
+      maximum_in_memory_characters: 100000
+
+scheduler:
+  # Actual Phase 2-6 work is intentionally sequential for this milestone.
+  # Do not increase this value until concurrent encoding has been tested.
+  max_concurrent_cameras: 1
+
+  queue_policy: "round_robin"
+  queue_poll_interval_seconds: 0.25
+  fail_fast: false
+
+  # Admission thresholds delay new processing jobs. They do not terminate
+  # a job after it has started.
+  cpu_admission_threshold_percent: 95.0
+  memory_admission_threshold_percent: 90.0
+  resource_admission_timeout_seconds: 30.0
+
+resource_monitor:
+  enabled: true
+  sample_interval_seconds: 1.0
+  include_process_metrics: true
+
+  gpu:
+    # GPU metrics are optional. Missing nvidia-smi is reported but is not
+    # treated as a pipeline failure.
+    enabled: true
+    nvidia_smi_path: "nvidia-smi"
+    query_timeout_seconds: 5.0
+
+health_monitor:
+  enabled: true
+  check_interval_seconds: 2.0
+  default_stale_timeout_seconds: 30.0
+  maximum_consecutive_health_failures: 3
+
+  # Completed local files are not stale simply because their timestamps
+  # do not change. Stale detection is reserved for live source types.
+  stale_detection_source_types:
+    - "rtsp"
+
+reconnect:
+  enabled: true
+
+  # Reconnection does not apply to finite local files. RTSP reconnection
+  # remains unvalidated and no production claim is made.
+  eligible_source_types:
+    - "rtsp"
+
+  maximum_attempts: 3
+  initial_delay_seconds: 1.0
+  backoff_multiplier: 2.0
+  maximum_delay_seconds: 30.0
+
+reporting:
+  json_filename: "phase7_run_report.json"
+  text_filename: "phase7_run_report.txt"
+  write_camera_reports: true
+  redact_uri_credentials: true
+  include_resource_samples: true
+
+sources:
+  # Required default smoke-test and single-camera integration source.
+  - camera_id: "camera_01"
+    enabled: true
+    source_type: "local_file"
+    source: "../sample_videos/invalid_test.mp4"
+    required: true
+    display_name: "Primary local test camera"
+    tags:
+      - "smoke-test"
+      - "local"
+
+  # Missing optional sources are skipped with warnings and do not erase a
+  # successful result for camera_01.
+  - camera_id: "camera_02"
+    enabled: true
+    source_type: "local_file"
+    source: "../sample_videos/test2.mp4"
+    required: false
+    display_name: "Optional local camera 2"
+    tags:
+      - "local"
+
+  - camera_id: "camera_03"
+    enabled: true
+    source_type: "local_file"
+    source: "../sample_videos/test3.mp4"
+    required: false
+    display_name: "Optional local camera 3"
+    tags:
+      - "local"
+
+  - camera_id: "camera_04"
+    enabled: true
+    source_type: "local_file"
+    source: "../sample_videos/test4.mp4"
+    required: false
+    display_name: "Optional local camera 4"
+    tags:
+      - "local"

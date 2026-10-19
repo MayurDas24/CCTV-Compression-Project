@@ -1,0 +1,27 @@
+paths:
+  source_video: "../sample_videos/test1.mp4"
+  phase3_decisions: "../phase_3/outputs/frame_decisions.jsonl"
+  phase4_compressed_video: "../phase_4/outputs/compressed_video.mp4"
+  phase4_summary: "../phase_4/outputs/compression_summary.json"
+  phase5_report_json: "../phase_5/outputs/phase5_report.json"
+  phase5_report_text: "../phase_5/outputs/phase5_report.txt"
+
+  output_directory: "outputs"
+  final_video: "outputs/compressed_video.mp4"
+  final_json_report: "outputs/phase_6_final_report.json"
+  final_text_report: "outputs/phase_6_final_report.txt"
+  manifest: "outputs/phase_6_artifact_manifest.json"
+
+validation:
+  fps_tolerance: 0.05
+  duration_tolerance_seconds: 0.25
+  compression_ratio_tolerance: 0.000001
+  storage_reduction_tolerance_percent: 0.000001
+
+runtime:
+  ffprobe_path: "ffprobe"
+  probe_timeout_seconds: 120
+  overwrite: true
+
+logging:
+  level: "INFO"

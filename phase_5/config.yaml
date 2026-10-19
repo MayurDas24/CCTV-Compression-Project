@@ -1,0 +1,34 @@
+# Phase 5 - Quality and Forensic Validation
+
+inputs:
+  source_video: "../sample_videos/test1.mp4"
+  phase3_decisions: "../phase_3/outputs/frame_decisions.jsonl"
+  phase4_compressed_video: "../phase_4/outputs/compressed_video.mp4"
+  phase4_compression_summary: "../phase_4/outputs/compression_summary.json"
+
+output:
+  directory: "outputs"
+  json_report: "outputs/phase5_report.json"
+  text_report: "outputs/phase5_report.txt"
+
+validation:
+  fail_on_malformed_decisions: true
+  fail_on_phase4_count_mismatch: true
+
+quality:
+  enabled: true
+  metrics:
+    - psnr
+    - ssim
+    - vmaf
+  maximum_fps_difference: 0.01
+  maximum_duration_difference_seconds: 0.10
+  timeout_seconds: 0
+
+runtime:
+  ffmpeg_path: "ffmpeg"
+  ffprobe_path: "ffprobe"
+  ffprobe_timeout_seconds: 120
+
+logging:
+  level: "INFO"

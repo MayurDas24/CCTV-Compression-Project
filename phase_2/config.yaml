@@ -1,0 +1,87 @@
+# ============================================================
+# Phase 2 - Perception Layer Configuration
+# ============================================================
+
+input:
+  # Local video file or RTSP stream
+  source: "../sample_videos/test1.mp4"
+
+  # Supported values:
+  #   file  -> local video
+  #   rtsp  -> RTSP camera/stream
+  type: "file"
+
+
+# ============================================================
+# Frame Sampling
+# ============================================================
+
+sampling:
+  # Supported modes:
+  #   fps      -> sample at approximately the requested FPS
+  #   interval -> process every Nth frame
+  mode: "fps"
+
+  # Used when mode = fps
+  fps: 2.0
+
+  # Used when mode = interval
+  frame_interval: 15
+
+
+# ============================================================
+# Object Detection
+# ============================================================
+
+detector:
+  # Ultralytics YOLO model
+  model: "yolov8n.pt"
+
+  # Minimum confidence for a detection
+  confidence_threshold: 0.25
+
+  # IoU threshold used by NMS
+  iou_threshold: 0.45
+
+  # auto / cpu / cuda
+  device: "auto"
+
+
+# ============================================================
+# Importance Scoring
+# ============================================================
+
+importance:
+  class_weights:
+    person: 1.0
+    car: 0.8
+    truck: 0.8
+    bus: 0.8
+    motorcycle: 0.8
+    bicycle: 0.7
+    dog: 0.5
+    cat: 0.5
+
+  default_class_weight: 0.3
+
+  confidence_weight: 0.3
+  area_weight: 0.3
+  center_weight: 0.4
+
+
+# ============================================================
+# Output
+# ============================================================
+
+output:
+  directory: "outputs"
+  metadata_file: "outputs/perception.jsonl"
+  summary_file: "outputs/summary.json"
+
+
+# ============================================================
+# Logging
+# ============================================================
+
+logging:
+  level: "INFO"

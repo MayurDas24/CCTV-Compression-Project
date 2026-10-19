@@ -1,0 +1,42 @@
+paths:
+  source_video: "../sample_videos/test1.mp4"
+  phase3_decisions: "../phase_3/outputs/frame_decisions.jsonl"
+  output_video: "outputs/compressed_video.mp4"
+  compression_summary: "outputs/compression_summary.json"
+
+encoding:
+  codec: "libx265"
+  preset: "medium"
+  pixel_format: "yuv420p"
+  container: "mp4"
+  movflags: "+faststart"
+  priority_crf:
+    critical: 22
+    high: 25
+    medium: 28
+    low: 32
+
+audio:
+  enabled: true
+  mode: "copy"
+  bitrate: "128k"
+
+temporal:
+  preserve_source_fps: true
+  preserve_duration: true
+  physically_drop_frames: false
+
+validation:
+  fps_tolerance: 0.05
+  duration_tolerance_seconds: 0.25
+  fail_on_malformed_decisions: true
+
+runtime:
+  ffmpeg_path: "ffmpeg"
+  ffprobe_path: "ffprobe"
+  overwrite: true
+  keep_temporary_files: false
+  probe_timeout_seconds: 120
+
+logging:
+  level: "INFO"

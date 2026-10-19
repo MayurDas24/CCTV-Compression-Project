@@ -1,0 +1,50 @@
+@'
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated phase outputs and logs
+phase_*/outputs/
+*.log
+
+# Local video test data and temporary encoding files
+sample_videos/*.mp4
+live_test/*.mp4
+*.ts
+'@ | Set-Content -Encoding utf8 .gitignorephase_0/results/*.mp4
+phase_0/yolov8n.pt
+phase_1/logs/streams/*.mp4
+yolov8n.pt
+
+# Exclude experimental backup
+phase_4_backup/
+
+# Exclude generated videos and local stream recordings
+phase_0/results/*.mp4
+phase_1/logs/streams/*.mp4
+
+# Exclude downloaded YOLO model weights
+yolov8n.pt
+phase_0/yolov8n.pt
+
+# Exclude generated reports and outputs
+phase_*/outputs/

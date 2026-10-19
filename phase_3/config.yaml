@@ -1,0 +1,44 @@
+# ============================================================
+# Phase 3 - Intelligent Frame Decision Configuration
+# ============================================================
+
+input:
+  # Phase 2 perception metadata
+  metadata_file: "../phase_2/outputs/perception.jsonl"
+
+decision:
+  # Frames above this importance score are retained
+  high_importance_threshold: 0.30
+
+  # Frames below this score may be discarded
+  low_importance_threshold: 0.15
+
+  # Minimum confidence for considering a detection important
+  minimum_detection_confidence: 0.25
+
+  # Always retain frames containing these classes
+  critical_classes:
+    - person
+
+  # Retain frames containing these classes when importance
+  # exceeds the configured threshold
+  important_classes:
+    - car
+    - truck
+    - bus
+    - motorcycle
+    - bicycle
+
+  # Maximum number of consecutive frames that can be dropped
+  max_consecutive_drops: 10
+
+  # Whether to retain frames with no detected objects
+  retain_empty_frames: false
+
+output:
+  directory: "outputs"
+  decisions_file: "outputs/frame_decisions.jsonl"
+  summary_file: "outputs/summary.json"
+
+logging:
+  level: "INFO"
